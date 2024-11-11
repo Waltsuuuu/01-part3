@@ -1,8 +1,25 @@
 const express = require('express')
 const http = require("http");
 const app = express();
+const mongoose = require("mongoose");
+const dotenv = require('dotenv')
+dotenv.config();
 
 app.use(express.json())
+
+
+const url = process.env.MONGODB_URI;
+
+mongoose.set("strictQuery", false);
+
+mongoose.connect(url);
+
+const noteSchema = new mongoose.Schema({
+  content: String,
+  important: Boolean,
+});
+
+const Note = mongoose.model("Note", noteSchema);
 
 
 let notes = [
@@ -28,10 +45,16 @@ app.get("/", (request, response) => {
 });
 
 
+app.get('/api/notes', (request, response) => {
+  Note.find({}).then(notes => {
+    response.json(notes)
+  })
+})
+/*
 app.get("/api/notes", (request, response) => {
   response.json(notes);
 });
-
+*/
 
 const generateId = () => {
   const maxId = notes.length > 0
