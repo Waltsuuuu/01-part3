@@ -1,33 +1,12 @@
 const express = require('express')
 const http = require("http");
 const app = express();
-const mongoose = require("mongoose");
 const dotenv = require('dotenv')
 dotenv.config();
 
+const Note = require('./models/note')
+
 app.use(express.json())
-
-
-const url = process.env.MONGODB_URI;
-
-mongoose.set("strictQuery", false);
-
-mongoose.connect(url);
-
-const noteSchema = new mongoose.Schema({
-  content: String,
-  important: Boolean,
-});
-
-noteSchema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString()
-    delete returnedObject._id
-    delete returnedObject.__v
-  }
-})
-
-const Note = mongoose.model("Note", noteSchema);
 
 
 let notes = [
@@ -78,7 +57,7 @@ app.post('/api/notes', (request, response) => {
   })
 
   note.save().then(savedNote => {
-    respinse.json(savedNote)
+    response.json(savedNote)
   })
 })
 
@@ -86,9 +65,7 @@ app.post('/api/notes', (request, response) => {
 app.get("/api/notes", (request, response) => {
   response.json(notes);
 });
-*/
 
-/*
 const generateId = () => {
   const maxId = notes.length > 0
     ? Math.max(...notes.map(n => Number(n.id)))
@@ -115,7 +92,6 @@ app.post('/api/notes', (request, response) => {
 
   response.json(note)
 })
-*/
 
 app.get("/api/notes/:id", (request, response) => {
     const id = request.params.id
@@ -125,7 +101,6 @@ app.get("/api/notes/:id", (request, response) => {
 
 })
 
-/*
 app.delete('/api/notes/:id', (request, response) => {
     const id = request.params.id
     notes = notes.filter(note => note.id !== id)
@@ -133,6 +108,7 @@ app.delete('/api/notes/:id', (request, response) => {
     response.status(204).end()
   })
 */
+
 const PORT = process.env.PORT;
 app.listen(PORT);
 console.log(`Server running on port ${PORT}`);
